@@ -19,6 +19,9 @@ interface AppContextType extends AppState {
   redo: () => void;
   duplicateElement: (elementId: string) => void;
   moveElement: (elementId: string, direction: 'up' | 'down') => void;
+  addElementToColumn: (rowId: string, columnIndex: number, element: EmailElement | LayoutElement) => void;
+  moveElementToIndex: (elementId: string, newIndex: number) => void;
+  moveElementToColumn: (elementId: string, rowId: string, columnIndex: number) => void;
 }
 
 type AppAction = 
@@ -65,7 +68,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, theme: action.payload };
     case 'TOGGLE_DARK_MODE':
       return { ...state, darkMode: !state.darkMode };
-    case 'ADD_TO_HISTORY':
+    case 'ADD_TO_HISTORY': {
       const newHistory = state.history.slice(0, state.historyIndex + 1);
       newHistory.push(action.payload);
       return { 
@@ -73,6 +76,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
         history: newHistory.slice(-50), // Keep last 50 states
         historyIndex: newHistory.length - 1 
       };
+    }
     case 'UNDO':
       if (state.historyIndex > 0) {
         return {
@@ -200,7 +204,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           return { ...el, children: updateElementsRecursively(el.children) };
         }
         return el;
-      });
+      }) as (EmailElement | LayoutElement)[];
     };
 
     const updatedTemplate = {
@@ -290,6 +294,137 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'SET_TEMPLATE', payload: updatedTemplate });
   };
 
+  const moveElementToIndex = (elementId: string, newIndex: number) => {
+    if (!state.currentTemplate) return;
+
+    const removeElement = (elements: (EmailElement | LayoutElement)[]): { element: EmailElement | LayoutElement | null, remaining: (EmailElement | LayoutElement)[], originalIndex: number } => {
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i].id === elementId) {
+          const element = elements[i];
+          const remaining = [...elements.slice(0, i), ...elements.slice(i + 1)];
+          return { element, remaining, originalIndex: i };
+        }
+        if ('children' in elements[i] && (elements[i] as LayoutElement).children) {
+          const result = removeElement((elements[i] as LayoutElement).children);
+          if (result.element) {
+            const updatedElement = { ...elements[i], children: result.remaining };
+            const updatedElements = [...elements.slice(0, i), updatedElement, ...elements.slice(i + 1)];
+            return { element: result.element, remaining: updatedElements, originalIndex: -1 };
+          }
+        }
+      }
+      return { element: null, remaining: elements, originalIndex: -1 };
+    };
+
+    const { element, remaining, originalIndex } = removeElement(state.currentTemplate.elements);
+    if (!element) return;
+
+    // Adjust the new index if we're moving within the same level and moving to a position after the original
+    let adjustedIndex = newIndex;
+    if (originalIndex !== -1 && originalIndex < newIndex) {
+      adjustedIndex = Math.max(0, newIndex - 1);
+    }
+
+    // Ensure index is within bounds
+    adjustedIndex = Math.min(adjustedIndex, remaining.length);
+
+    const newElements = [...remaining];
+    newElements.splice(adjustedIndex, 0, element);
+
+    const updatedTemplate = {
+      ...state.currentTemplate,
+      elements: newElements,
+      updatedAt: new Date()
+    };
+
+    dispatch({ type: 'ADD_TO_HISTORY', payload: updatedTemplate });
+    dispatch({ type: 'SET_TEMPLATE', payload: updatedTemplate });
+    dispatch({ type: 'SELECT_ELEMENT', payload: element });
+  };
+
+  const addElementToColumn = (rowId: string, columnIndex: number, element: EmailElement | LayoutElement) => {
+    if (!state.currentTemplate) return;
+
+    const newElements = [...state.currentTemplate.elements];
+    const findAndUpdateRow = (elements: (EmailElement | LayoutElement)[]): (EmailElement | LayoutElement)[] => {
+      return elements.map(el => {
+        if (el.id === rowId && el.type === 'row') {
+          const updatedChildren = [...(el.children || [])];
+          updatedChildren[columnIndex] = element;
+          return { ...el, children: updatedChildren };
+        }
+        if ('children' in el && el.children) {
+          return { ...el, children: findAndUpdateRow(el.children) };
+        }
+        return el;
+      });
+    };
+
+    const updatedElements = findAndUpdateRow(newElements);
+    const updatedTemplate = {
+      ...state.currentTemplate,
+      elements: updatedElements,
+      updatedAt: new Date()
+    };
+
+    dispatch({ type: 'ADD_TO_HISTORY', payload: updatedTemplate });
+    dispatch({ type: 'SET_TEMPLATE', payload: updatedTemplate });
+    dispatch({ type: 'SELECT_ELEMENT', payload: element });
+  };
+
+  const moveElementToColumn = (elementId: string, rowId: string, columnIndex: number) => {
+    if (!state.currentTemplate) return;
+
+    // First, remove the element from wherever it currently is
+    const removeElement = (elements: (EmailElement | LayoutElement)[]): { element: EmailElement | LayoutElement | null, remaining: (EmailElement | LayoutElement)[] } => {
+      for (let i = 0; i < elements.length; i++) {
+        if (elements[i].id === elementId) {
+          const element = elements[i];
+          const remaining = [...elements.slice(0, i), ...elements.slice(i + 1)];
+          return { element, remaining };
+        }
+        if ('children' in elements[i] && (elements[i] as LayoutElement).children) {
+          const result = removeElement((elements[i] as LayoutElement).children);
+          if (result.element) {
+            const updatedElement = { ...elements[i], children: result.remaining };
+            const updatedElements = [...elements.slice(0, i), updatedElement, ...elements.slice(i + 1)];
+            return { element: result.element, remaining: updatedElements };
+          }
+        }
+      }
+      return { element: null, remaining: elements };
+    };
+
+    const { element, remaining } = removeElement(state.currentTemplate.elements);
+    if (!element) return;
+
+    // Now add the element to the specified column
+    const addToColumn = (elements: (EmailElement | LayoutElement)[]): (EmailElement | LayoutElement)[] => {
+      return elements.map(el => {
+        if (el.id === rowId && el.type === 'row') {
+          const updatedChildren = [...(el.children || [])];
+          updatedChildren[columnIndex] = element;
+          return { ...el, children: updatedChildren };
+        }
+        if ('children' in el && el.children) {
+          return { ...el, children: addToColumn(el.children) };
+        }
+        return el;
+      });
+    };
+
+    const updatedElements = addToColumn(remaining);
+    const updatedTemplate = {
+      ...state.currentTemplate,
+      elements: updatedElements,
+      updatedAt: new Date()
+    };
+
+    dispatch({ type: 'ADD_TO_HISTORY', payload: updatedTemplate });
+    dispatch({ type: 'SET_TEMPLATE', payload: updatedTemplate });
+    dispatch({ type: 'SELECT_ELEMENT', payload: element });
+  };
+
   const contextValue: AppContextType = {
     ...state,
     dispatch,
@@ -319,7 +454,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     undo: () => dispatch({ type: 'UNDO' }),
     redo: () => dispatch({ type: 'REDO' }),
     duplicateElement,
-    moveElement
+    moveElement,
+    addElementToColumn,
+    moveElementToIndex,
+    moveElementToColumn
   };
 
   return (

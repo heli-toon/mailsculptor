@@ -16,13 +16,28 @@ export function DropZone({ children, className = '' }: DropZoneProps) {
     e.stopPropagation();
     
     try {
-      const data = JSON.parse(e.dataTransfer.getData('application/json'));
-      
-      if (data.type === 'element') {
-        const newElement = createElementFromType(data.elementType);
-        if (newElement) {
-          addElement(newElement);
+      const jsonData = e.dataTransfer.getData('application/json');
+      const textData = e.dataTransfer.getData('text/plain');
+
+      // Only handle new elements from toolbar in the main drop zone
+      if (jsonData) {
+        try {
+          const data = JSON.parse(jsonData);
+          if (data.type === 'element') {
+            const newElement = createElementFromType(data.elementType);
+            if (newElement) addElement(newElement);
+            return;
+          }
+          // If JSON exists but is not a new element, fall back to text/plain
+        } catch {
+          // JSON parse failed, fall back to text/plain below
         }
+      }
+
+      if (textData) {
+        // Fallback: text/plain carries the elementType
+        const newElement = createElementFromType(textData);
+        if (newElement) addElement(newElement);
       }
     } catch (error) {
       console.error('Failed to process drop:', error);

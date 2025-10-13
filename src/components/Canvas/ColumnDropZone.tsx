@@ -3,17 +3,18 @@ import { useApp } from '../../contexts/AppContext';
 import { EmailElement, LayoutElement } from '../../types';
 import { generateId } from '../../utils/helpers';
 
-interface InsertDropZoneProps {
-  index: number;
+interface ColumnDropZoneProps {
+  rowId: string;
+  columnIndex: number;
+  children?: React.ReactNode;
 }
 
-const KNOWN_TYPES = new Set(['text','heading','button','link','image','logo','divider','spacer','social','row']);
+const KNOWN_TYPES = new Set(['text','heading','button','link','image','logo','divider','spacer','social']);
 
-export function InsertDropZone({ index }: InsertDropZoneProps) {
-  const { addElementAtIndex, moveElementToIndex } = useApp();
+export function ColumnDropZone({ rowId, columnIndex, children }: ColumnDropZoneProps) {
+  const { addElementToColumn, moveElementToColumn } = useApp();
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Determine intended operation to align dropEffect with source effectAllowed
   const getDropIntent = (e: React.DragEvent): 'new' | 'existing' => {
     try {
       const jsonData = e.dataTransfer.getData('application/json');
@@ -23,7 +24,7 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
         if (data?.type === 'element') return 'new';
       }
     } catch {
-      // ignore and fall through to text/plain
+      // ignore and fall through
     }
     const textData = e.dataTransfer.getData('text/plain');
     if (textData) {
@@ -45,31 +46,30 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
         const data = JSON.parse(jsonData);
         if (data.type === 'element') {
           const newElement = createElementFromType(data.elementType);
-          if (newElement) addElementAtIndex(newElement, index);
+          if (newElement) addElementToColumn(rowId, columnIndex, newElement);
           return;
         } else if (data.type === 'existing-element') {
-          moveElementToIndex(data.elementId, index);
+          moveElementToColumn(data.elementId, rowId, columnIndex);
           return;
         }
-        // Fallback if JSON is present but not recognized
+        // Fallback if JSON not recognized
         if (textData) {
           if (KNOWN_TYPES.has(textData)) {
             const newElement = createElementFromType(textData);
-            if (newElement) addElementAtIndex(newElement, index);
+            if (newElement) addElementToColumn(rowId, columnIndex, newElement);
           } else {
-            moveElementToIndex(textData, index);
+            moveElementToColumn(textData, rowId, columnIndex);
           }
           return;
         }
       }
 
       if (textData) {
-        // text/plain might be elementType (new) or elementId (existing)
         if (KNOWN_TYPES.has(textData)) {
           const newElement = createElementFromType(textData);
-          if (newElement) addElementAtIndex(newElement, index);
+          if (newElement) addElementToColumn(rowId, columnIndex, newElement);
         } else {
-          moveElementToIndex(textData, index);
+          moveElementToColumn(textData, rowId, columnIndex);
         }
       }
     } catch (error) {
@@ -78,9 +78,9 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
       if (fallback) {
         if (KNOWN_TYPES.has(fallback)) {
           const newElement = createElementFromType(fallback);
-          if (newElement) addElementAtIndex(newElement, index);
+          if (newElement) addElementToColumn(rowId, columnIndex, newElement);
         } else {
-          moveElementToIndex(fallback, index);
+          moveElementToColumn(fallback, rowId, columnIndex);
         }
       }
     }
@@ -214,16 +214,6 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
           ]
         };
 
-      case 'row':
-        return {
-          id,
-          type: 'row',
-          columns: 2,
-          children: [],
-          padding: '20px',
-          margin: '10px 0'
-        };
-
       default:
         return null;
     }
@@ -231,20 +221,26 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
 
   return (
     <div
-      className={`transition-all duration-200 ${
+      className={`min-h-[80px] border-2 border-dashed rounded-md p-2 transition-all ${
         isDragOver 
-          ? 'h-16 bg-purple-100 dark:bg-purple-900/20 border-2 border-dashed border-purple-400 my-2 rounded-md' 
-          : 'h-6 my-1 border-2 border-dashed border-transparent hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md'
+          ? 'border-purple-400 bg-purple-50 dark:bg-purple-900/20' 
+          : 'border-gray-200 dark:border-gray-600'
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >
-      {isDragOver && (
-        <div className="flex items-center justify-center h-full text-purple-600 dark:text-purple-400 text-sm font-medium">
-          <i className="bi bi-plus-circle mr-2"></i>
-          Drop here to insert
+      {children || (
+        <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+          {isDragOver ? (
+            <>
+              <i className="bi bi-plus-circle mr-2"></i>
+              Drop element here
+            </>
+          ) : (
+            'Drop element here'
+          )}
         </div>
       )}
     </div>

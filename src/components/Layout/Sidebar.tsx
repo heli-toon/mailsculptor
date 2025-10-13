@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useApp } from '../../contexts/AppContext';
 import { Button } from '../ui/Button';
 
 export function Sidebar({ children }: { children: React.ReactNode }) {

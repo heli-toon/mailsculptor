@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface ColorPickerProps {
   label?: string;
@@ -41,7 +41,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           <div className="absolute top-full left-0 z-10 mt-1 p-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
             <div className="grid grid-cols-9 gap-1 mb-3">
               {presetColors.map(color => (
-                <button
+                <button title='Select color'
                   key={color}
                   type="button"
                   className="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
@@ -53,7 +53,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
                 />
               ))}
             </div>
-            <input
+            <input title='Custom color'
               type="color"
               value={value}
               onChange={(e) => onChange(e.target.value)}

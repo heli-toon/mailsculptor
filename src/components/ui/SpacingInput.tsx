@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface SpacingInputProps {
   label: string;
@@ -42,21 +42,21 @@ export function SpacingInput({ label, value, onChange, placeholder = '0' }: Spac
 
       {mode === 'simple' ? (
         <div className="flex items-center gap-2">
-          <button
+          <button title='Decrease'
             type="button"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border border-gray-300 dark:border-gray-600"
             onClick={() => handleSimpleChange(simpleValue - 1)}
           >
             <i className="bi bi-dash"></i>
           </button>
-          <input
+          <input title='Value'
             type="number"
             value={simpleValue}
             onChange={(e) => handleSimpleChange(parseInt(e.target.value) || 0)}
             className="flex-1 px-3 py-2 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             min="0"
           />
-          <button
+          <button title='Increase'
             type="button"
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors border border-gray-300 dark:border-gray-600"
             onClick={() => handleSimpleChange(simpleValue + 1)}

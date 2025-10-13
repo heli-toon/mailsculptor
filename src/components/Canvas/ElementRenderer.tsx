@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { EmailElement, LayoutElement } from '../../types';
 import { getThemeColors } from '../../utils/helpers';
+import { ColumnDropZone } from './ColumnDropZone';
 
 interface ElementRendererProps {
   element: EmailElement | LayoutElement;
@@ -18,37 +19,70 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
     onSelect?.(element);
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    e.stopPropagation();
+    const dragData = {
+      type: 'existing-element',
+      elementId: element.id,
+      element: element
+    };
+    e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+    e.dataTransfer.setData('text/plain', element.id); // Fallback
+    e.dataTransfer.effectAllowed = 'move';
+    
+    // Add visual feedback
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '0.5';
+    }
+  };
+
+  const handleDragEnd = (e: React.DragEvent) => {
+    e.stopPropagation();
+    // Remove visual feedback
+    if (e.currentTarget instanceof HTMLElement) {
+      e.currentTarget.style.opacity = '';
+    }
+  };
+
   const renderLayoutElement = (layoutElement: LayoutElement) => {
     if (layoutElement.type === 'row') {
       const columns = layoutElement.columns || 1;
       
       return (
         <div
-          className={`relative group ${isSelected ? 'ring-2 ring-purple-500' : ''}`}
+          className={`relative group ${isSelected ? 'ring-2 ring-purple-500' : ''} cursor-move`}
           onClick={handleSelect}
+          draggable={true}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
           style={{
             backgroundColor: layoutElement.backgroundColor || 'transparent',
             padding: layoutElement.padding || '10px',
             margin: layoutElement.margin || '0'
           }}
         >
-          <div className={`grid grid-cols-${columns} gap-2 min-h-[60px]`}>
+          <div className={`grid gap-2 min-h-[80px]`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
             {Array.from({ length: columns }).map((_, index) => {
-              const childElement = layoutElement.children[index];
+              const childElement = layoutElement.children?.[index];
               return (
-                <div key={index} className="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded p-2 min-h-[50px] flex items-center justify-center">
-                  {childElement ? (
+                <ColumnDropZone key={index} rowId={layoutElement.id} columnIndex={index}>
+                  {childElement && (
                     <ElementRenderer 
                       element={childElement} 
                       onSelect={onSelect}
                       isSelected={isSelected && childElement.id === element.id}
                     />
-                  ) : (
-                    <span className="text-gray-400 text-sm">Drop element here</span>
                   )}
-                </div>
+                </ColumnDropZone>
               );
             })}
+          </div>
+          
+          {/* Drag Handle and Controls */}
+          <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="bg-white dark:bg-gray-800 rounded shadow-lg p-1">
+              <i className="bi bi-grip-vertical text-gray-400 cursor-move"></i>
+            </div>
           </div>
           
           {/* Hover Controls */}
@@ -105,45 +139,63 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       border: emailElement.border || 'none'
     };
 
-    const wrapperClass = `relative group ${isSelected ? 'ring-2 ring-purple-500' : ''} cursor-pointer`;
+    const wrapperClass = `relative group ${isSelected ? 'ring-2 ring-purple-500' : ''} cursor-move`;
 
     const renderControls = () => (
-      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 bg-white dark:bg-gray-800 rounded shadow-lg p-1 z-10">
-        <button
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
-          onClick={(e) => { e.stopPropagation(); moveElement(element.id, 'up'); }}
-          title="Move Up"
-        >
-          <i className="bi bi-arrow-up"></i>
-        </button>
-        <button
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
-          onClick={(e) => { e.stopPropagation(); moveElement(element.id, 'down'); }}
-          title="Move Down"
-        >
-          <i className="bi bi-arrow-down"></i>
-        </button>
-        <button
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
-          onClick={(e) => { e.stopPropagation(); duplicateElement(element.id); }}
-          title="Duplicate"
-        >
-          <i className="bi bi-files"></i>
-        </button>
-        <button
-          className="p-1 hover:bg-red-100 text-red-600 rounded text-xs"
-          onClick={(e) => { e.stopPropagation(); deleteElement(element.id); }}
-          title="Delete"
-        >
-          <i className="bi bi-trash"></i>
-        </button>
-      </div>
+      <>
+        {/* Drag Handle */}
+        <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="bg-white dark:bg-gray-800 rounded shadow-lg p-1">
+            <i className="bi bi-grip-vertical text-gray-400 cursor-move"></i>
+          </div>
+        </div>
+        
+        {/* Action Controls */}
+        <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 bg-white dark:bg-gray-800 rounded shadow-lg p-1 z-10">
+          <button
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
+            onClick={(e) => { e.stopPropagation(); moveElement(element.id, 'up'); }}
+            title="Move Up"
+          >
+            <i className="bi bi-arrow-up"></i>
+          </button>
+          <button
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
+            onClick={(e) => { e.stopPropagation(); moveElement(element.id, 'down'); }}
+            title="Move Down"
+          >
+            <i className="bi bi-arrow-down"></i>
+          </button>
+          <button
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-xs"
+            onClick={(e) => { e.stopPropagation(); duplicateElement(element.id); }}
+            title="Duplicate"
+          >
+            <i className="bi bi-files"></i>
+          </button>
+          <button
+            className="p-1 hover:bg-red-100 text-red-600 rounded text-xs"
+            onClick={(e) => { e.stopPropagation(); deleteElement(element.id); }}
+            title="Delete"
+          >
+            <i className="bi bi-trash"></i>
+          </button>
+        </div>
+      </>
     );
+
+    const commonProps = {
+      className: wrapperClass,
+      onClick: handleSelect,
+      draggable: true,
+      onDragStart: handleDragStart,
+      onDragEnd: handleDragEnd
+    };
 
     switch (emailElement.type) {
       case 'text':
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <div style={styles} dangerouslySetInnerHTML={{ __html: emailElement.content || 'Sample text' }} />
             {renderControls()}
           </div>
@@ -151,7 +203,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
 
       case 'heading':
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <h2 style={styles}>{emailElement.content || 'Heading'}</h2>
             {renderControls()}
           </div>
@@ -160,7 +212,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       case 'button':
         const buttonBg = emailElement.backgroundColor || themeColors.primary;
         return (
-          <div className={wrapperClass} onClick={handleSelect} style={{ textAlign: styles.textAlign as any }}>
+          <div {...commonProps} style={{ textAlign: styles.textAlign as any }}>
             <div
               style={{
                 display: 'inline-block',
@@ -181,7 +233,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       case 'link':
         const linkColor = emailElement.color || themeColors.primary;
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <div style={styles}>
               <span style={{ color: linkColor, textDecoration: 'underline' }}>
                 {emailElement.content || 'Link text'}
@@ -194,7 +246,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       case 'image':
       case 'logo':
         return (
-          <div className={wrapperClass} onClick={handleSelect} style={{ textAlign: styles.textAlign as any }}>
+          <div {...commonProps} style={{ textAlign: styles.textAlign as any }}>
             <img
               src={emailElement.src || 'https://via.placeholder.com/150x100?text=Image'}
               alt={emailElement.alt || ''}
@@ -212,7 +264,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
 
       case 'divider':
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <hr style={{ 
               border: 'none', 
               borderTop: `1px solid ${emailElement.color || '#cccccc'}`, 
@@ -226,7 +278,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       case 'spacer':
         const spacerHeight = emailElement.height || '20px';
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <div
               style={{
                 height: spacerHeight,
@@ -249,7 +301,7 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
       case 'social':
         const socialIcons = emailElement.socialIcons || [];
         return (
-          <div className={wrapperClass} onClick={handleSelect}>
+          <div {...commonProps}>
             <div style={styles}>
               {socialIcons.length > 0 ? (
                 socialIcons.map((icon, index) => (

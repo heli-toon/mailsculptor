@@ -69,50 +69,50 @@ export function Canvas() {
 
       <div className="flex-1 flex items-start justify-center p-4 lg:p-8 overflow-y-auto">
         <div className="relative w-full max-w-4xl">
-        {/* Canvas Header */}
+          {/* Canvas Header */}
           <div className="mb-4 text-center">
-          <div className="inline-flex items-center space-x-2 bg-white dark:bg-gray-900 px-4 py-2 rounded-lg shadow-sm">
-            <i className={`bi bi-${viewMode === 'desktop' ? 'laptop' : 'phone'} text-purple-600`}></i>
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {viewMode === 'desktop' ? 'Desktop' : 'Mobile'} Preview ({canvasWidth})
-            </span>
+            <div className="inline-flex items-center space-x-2 bg-white dark:bg-gray-900 px-4 py-2 rounded-lg shadow-sm">
+              <i className={`bi bi-${viewMode === 'desktop' ? 'laptop' : 'phone'} text-purple-600`}></i>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {viewMode === 'desktop' ? 'Desktop' : 'Mobile'} Preview ({canvasWidth})
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* Canvas - Always white background like an HTML document */}
-        <div
-            className="bg-white shadow-xl rounded-lg overflow-hidden transition-all duration-300 mx-auto"
-          style={{ width: canvasWidth, minHeight: '600px' }}
-          onClick={handleCanvasClick}
-        >
-          {currentTemplate.elements.length === 0 ? (
+          {/* Canvas - Always white background like an HTML document */}
+          <div
+            className="bg-white shadow-xl rounded-lg overflow-hidden transition-all duration-300 mx-auto group"
+            style={{ width: canvasWidth, minHeight: '600px' }}
+            onClick={handleCanvasClick}
+          >
+            {currentTemplate.elements.length === 0 ? (
               <div className="h-96 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 m-4 rounded-lg">
-              <div className="text-center">
-                <i className="bi bi-plus-circle text-3xl mb-2 block"></i>
-                <p>Drag elements here to start building your email</p>
+                <div className="text-center">
+                  <i className="bi bi-plus-circle text-3xl mb-2 block"></i>
+                  <p>Drag elements here to start building your email</p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="p-4">
-              <InsertDropZone index={0} />
-              {currentTemplate.elements.map((element, index) => (
-                <React.Fragment key={element.id}>
-                  <ElementRenderer
-                    element={element}
-                    isSelected={selectedElement?.id === element.id}
-                    onSelect={selectElement}
-                  />
-                  <InsertDropZone index={index + 1} />
-                </React.Fragment>
-              ))}
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="p-4 space-y-1">
+                <InsertDropZone index={0} />
+                {currentTemplate.elements.map((element, index) => (
+                  <React.Fragment key={element.id}>
+                    <ElementRenderer
+                      element={element}
+                      isSelected={selectedElement?.id === element.id}
+                      onSelect={selectElement}
+                    />
+                    <InsertDropZone index={index + 1} />
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Canvas Footer Info */}
+          {/* Canvas Footer Info */}
           <div className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-          Email-safe HTML will be generated with table-based layout
-        </div>
+            Email-safe HTML will be generated with table-based layout
+          </div>
         </div>
       </div>
     </DropZone>

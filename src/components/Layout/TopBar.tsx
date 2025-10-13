@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { Button } from '../ui/Button';
 import { getThemeColors } from '../../utils/helpers';
@@ -27,7 +26,7 @@ export function TopBar() {
           {themes.map(t => {
             const colors = getThemeColors(t.value);
             return (
-              <button
+              <button type='button'
                 key={t.value}
                 className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 transition-all flex-shrink-0 ${
                   theme === t.value ? 'border-gray-800 dark:border-white scale-110' : 'border-gray-300'
