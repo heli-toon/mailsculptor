@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useApp } from '../../contexts/AppContext';
+import { useState } from 'react';
 import { Button } from '../ui/Button';
 import { ElementSettings } from './ElementSettings';
 

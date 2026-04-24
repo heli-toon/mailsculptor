@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { TopBar } from '../components/Layout/TopBar';
 import { LeftToolbar } from '../components/Toolbar/LeftToolbar';
 import { Canvas } from '../components/Canvas/Canvas';

@@ -1,6 +1,0 @@
-- Allow dragging of individual items
-- Allow to change color of email body
-- Fix drag items between items. It only works when the user drag exactly on the pixel between elements (which is almost impossible)
-- Remove/Fix the theme
-- Create better Templates to be used
-- Allow editing of Social Icons

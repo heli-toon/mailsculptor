@@ -210,7 +210,9 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
           socialIcons: [
             { platform: 'facebook', url: 'https://facebook.com' },
             { platform: 'twitter', url: 'https://twitter.com' },
-            { platform: 'instagram', url: 'https://instagram.com' }
+            { platform: 'instagram', url: 'https://instagram.com' },
+            { platform: 'linkedin', url: 'https://linkedin.com' },
+            { platform: 'youtube', url: 'https://youtube.com' }
           ]
         };
 
@@ -234,7 +236,7 @@ export function InsertDropZone({ index }: InsertDropZoneProps) {
       className={`transition-all duration-200 ${
         isDragOver 
           ? 'h-16 bg-purple-100 dark:bg-purple-900/20 border-2 border-dashed border-purple-400 my-2 rounded-md' 
-          : 'h-6 my-1 border-2 border-dashed border-transparent hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md'
+          : 'h-10 -my-3 border-2 border-dashed border-transparent hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md'
       }`}
       onDrop={handleDrop}
       onDragOver={handleDragOver}

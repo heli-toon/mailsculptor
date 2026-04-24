@@ -6,6 +6,7 @@ interface AppContextType extends AppState {
   dispatch: React.Dispatch<AppAction>;
   addElement: (element: EmailElement | LayoutElement, parentId?: string) => void;
   addElementAtIndex: (element: EmailElement | LayoutElement, index: number) => void;
+  updateTemplate: (updates: Partial<EmailTemplate>) => void;
   updateElement: (elementId: string, updates: Partial<EmailElement | LayoutElement>) => void;
   deleteElement: (elementId: string) => void;
   selectElement: (element: EmailElement | LayoutElement | null) => void;
@@ -40,6 +41,7 @@ const initialTemplate: EmailTemplate = {
   name: 'Untitled Template',
   elements: [],
   theme: 'purple',
+  bodyBackgroundColor: '#ffffff',
   createdAt: new Date(),
   updatedAt: new Date()
 };
@@ -59,7 +61,7 @@ const AppContext = createContext<AppContextType | null>(null);
 function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'SET_TEMPLATE':
-      return { ...state, currentTemplate: action.payload };
+      return { ...state, currentTemplate: action.payload, theme: action.payload.theme };
     case 'SELECT_ELEMENT':
       return { ...state, selectedElement: action.payload };
     case 'SET_VIEW_MODE':
@@ -186,6 +188,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const updatedTemplate = {
       ...state.currentTemplate,
       elements: updatedElements,
+      updatedAt: new Date()
+    };
+
+    dispatch({ type: 'ADD_TO_HISTORY', payload: updatedTemplate });
+    dispatch({ type: 'SET_TEMPLATE', payload: updatedTemplate });
+  };
+
+  const updateTemplate = (updates: Partial<EmailTemplate>) => {
+    if (!state.currentTemplate) return;
+
+    const updatedTemplate: EmailTemplate = {
+      ...state.currentTemplate,
+      ...updates,
       updatedAt: new Date()
     };
 
@@ -430,11 +445,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     dispatch,
     addElement,
     addElementAtIndex,
+    updateTemplate,
     updateElement,
     deleteElement,
     selectElement: (element) => dispatch({ type: 'SELECT_ELEMENT', payload: element }),
     setViewMode: (mode) => dispatch({ type: 'SET_VIEW_MODE', payload: mode }),
-    setTheme: (theme) => dispatch({ type: 'SET_THEME', payload: theme }),
+    setTheme: (theme) => {
+      dispatch({ type: 'SET_THEME', payload: theme });
+      updateTemplate({ theme });
+    },
     toggleDarkMode: () => dispatch({ type: 'TOGGLE_DARK_MODE' }),
     saveTemplate: () => {
       if (state.currentTemplate) {
@@ -442,11 +461,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }
     },
     loadTemplate: (template) => {
+      dispatch({ type: 'SET_THEME', payload: template.theme });
       dispatch({ type: 'ADD_TO_HISTORY', payload: template });
       dispatch({ type: 'SET_TEMPLATE', payload: template });
     },
     clearTemplate: () => {
       const newTemplate = { ...initialTemplate, id: generateId() };
+      dispatch({ type: 'SET_THEME', payload: newTemplate.theme });
       dispatch({ type: 'ADD_TO_HISTORY', payload: newTemplate });
       dispatch({ type: 'SET_TEMPLATE', payload: newTemplate });
       dispatch({ type: 'SELECT_ELEMENT', payload: null });

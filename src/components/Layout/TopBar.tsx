@@ -4,6 +4,7 @@ import { getThemeColors } from '../../utils/helpers';
 
 export function TopBar() {
   const { theme, setTheme, darkMode, toggleDarkMode, viewMode, setViewMode, undo, redo, history, historyIndex } = useApp();
+  const currentThemeColors = getThemeColors(theme);
 
   const themes = [
     { name: 'Purple', value: 'purple' as const },
@@ -37,6 +38,14 @@ export function TopBar() {
               />
             );
           })}
+          <input
+            aria-label="Custom theme color"
+            title="Custom theme color"
+            type="color"
+            value={currentThemeColors.primary}
+            onChange={(e) => setTheme(e.target.value as `#${string}`)}
+            className="w-6 h-6 p-0 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer bg-transparent"
+          />
         </div>
       </div>
 

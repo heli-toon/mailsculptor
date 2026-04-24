@@ -8,8 +8,8 @@ interface RowSettingsProps {
 export function RowSettings({ element }: RowSettingsProps) {
   const { updateElement } = useApp();
 
-  const handleChange = (property: string, value: any) => {
-    updateElement(element.id, { [property]: value });
+  const handleChange = <K extends keyof LayoutElement>(property: K, value: LayoutElement[K]) => {
+    updateElement(element.id, { [property]: value } as Partial<LayoutElement>);
   };
 
   return (

@@ -9,8 +9,8 @@ interface SocialSettingsProps {
 export function SocialSettings({ element }: SocialSettingsProps) {
   const { updateElement } = useApp();
 
-  const handleChange = (property: string, value: any) => {
-    updateElement(element.id, { [property]: value });
+  const handleChange = <K extends keyof EmailElement>(property: K, value: EmailElement[K]) => {
+    updateElement(element.id, { [property]: value } as Partial<EmailElement>);
   };
 
   const addSocialIcon = () => {
@@ -103,6 +103,11 @@ export function SocialSettings({ element }: SocialSettingsProps) {
                   <option value="linkedin">LinkedIn</option>
                   <option value="youtube">YouTube</option>
                   <option value="github">GitHub</option>
+                  <option value="pinterest">Pinterest</option>
+                  <option value="tiktok">TikTok</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="email">Email</option>
+                  <option value="website">Website</option>
                 </select>
                 
                 <input

@@ -6,6 +6,7 @@ export const sampleTemplates: EmailTemplate[] = [
     id: generateId(),
     name: 'Welcome Newsletter',
     theme: 'purple',
+    bodyBackgroundColor: '#ffffff',
     createdAt: new Date(),
     updatedAt: new Date(),
     elements: [
@@ -37,7 +38,8 @@ export const sampleTemplates: EmailTemplate[] = [
           {
             id: generateId(),
             type: 'text',
-            content: "Thanks for subscribing! We're excited to have you on board. You'll receive our latest updates, tips, and exclusive content right in your inbox.",
+            content:
+              "Thanks for subscribing! We're excited to have you on board. You'll receive our latest updates, tips, and exclusive content right in your inbox.",
             fontSize: '16px',
             textAlign: 'center',
             padding: '0 0 20px 0'
@@ -68,7 +70,9 @@ export const sampleTemplates: EmailTemplate[] = [
         socialIcons: [
           { platform: 'facebook', url: 'https://facebook.com' },
           { platform: 'twitter', url: 'https://twitter.com' },
-          { platform: 'instagram', url: 'https://instagram.com' }
+          { platform: 'instagram', url: 'https://instagram.com' },
+          { platform: 'linkedin', url: 'https://linkedin.com' },
+          { platform: 'youtube', url: 'https://youtube.com' }
         ]
       }
     ]
@@ -77,6 +81,7 @@ export const sampleTemplates: EmailTemplate[] = [
     id: generateId(),
     name: 'Product Announcement',
     theme: 'blue',
+    bodyBackgroundColor: '#ffffff',
     createdAt: new Date(),
     updatedAt: new Date(),
     elements: [
@@ -114,7 +119,8 @@ export const sampleTemplates: EmailTemplate[] = [
           {
             id: generateId(),
             type: 'text',
-            content: '<h3>New Product Launch</h3><p>Introducing our latest innovation that will revolutionize the way you work. Built with cutting-edge technology and user-centered design.</p>',
+            content:
+              '<h3>New Product Launch</h3><p>Introducing our latest innovation that will revolutionize the way you work. Built with cutting-edge technology and user-centered design.</p>',
             fontSize: '16px',
             padding: '20px'
           }
@@ -137,6 +143,7 @@ export const sampleTemplates: EmailTemplate[] = [
     id: generateId(),
     name: 'Minimal Newsletter',
     theme: 'black',
+    bodyBackgroundColor: '#ffffff',
     createdAt: new Date(),
     updatedAt: new Date(),
     elements: [
@@ -158,7 +165,7 @@ export const sampleTemplates: EmailTemplate[] = [
       {
         id: generateId(),
         type: 'text',
-        content: 'A curated selection of the week\'s most interesting stories and insights.',
+        content: "A curated selection of the week's most interesting stories and insights.",
         fontSize: '16px',
         textAlign: 'center',
         color: '#6B7280',
@@ -175,7 +182,8 @@ export const sampleTemplates: EmailTemplate[] = [
           {
             id: generateId(),
             type: 'text',
-            content: '<h4 style="margin: 0 0 10px 0;">Article Title</h4><p style="margin: 0; color: #6B7280;">Brief description of the article content and why it matters to your audience.</p>',
+            content:
+              '<h4 style="margin: 0 0 10px 0;">Article Title</h4><p style="margin: 0; color: #6B7280;">Brief description of the article content and why it matters to your audience.</p>',
             fontSize: '16px'
           }
         ]
@@ -190,5 +198,139 @@ export const sampleTemplates: EmailTemplate[] = [
         margin: '40px 0'
       }
     ]
+  },
+  {
+    id: generateId(),
+    name: 'Sale Promotion',
+    theme: '#F97316',
+    bodyBackgroundColor: '#FFF7ED',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    elements: [
+      {
+        id: generateId(),
+        type: 'row',
+        columns: 1,
+        backgroundColor: '#FFF7ED',
+        padding: '32px 20px',
+        children: [
+          {
+            id: generateId(),
+            type: 'heading',
+            content: 'Weekend Sale: Up to 40% Off',
+            fontSize: '30px',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            color: '#111827',
+            margin: '0 0 12px 0'
+          },
+          {
+            id: generateId(),
+            type: 'text',
+            content:
+              'Shop our best sellers with limited-time discounts. Ends Sunday at 11:59 PM.',
+            textAlign: 'center',
+            color: '#374151',
+            padding: '0 0 18px 0'
+          },
+          {
+            id: generateId(),
+            type: 'button',
+            content: 'Shop Now',
+            url: 'https://example.com',
+            backgroundColor: '#F97316',
+            color: '#ffffff',
+            borderRadius: '10px',
+            textAlign: 'center',
+            margin: '0'
+          }
+        ]
+      },
+      {
+        id: generateId(),
+        type: 'divider',
+        color: '#FED7AA',
+        margin: '20px 0'
+      },
+      {
+        id: generateId(),
+        type: 'social',
+        textAlign: 'center',
+        padding: '16px',
+        socialIcons: [
+          { platform: 'instagram', url: 'https://instagram.com' },
+          { platform: 'tiktok', url: 'https://tiktok.com' },
+          { platform: 'website', url: 'https://example.com' }
+        ]
+      }
+    ]
+  },
+  {
+    id: generateId(),
+    name: 'Event Invitation',
+    theme: '#3B82F6',
+    bodyBackgroundColor: '#EFF6FF',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    elements: [
+      {
+        id: generateId(),
+        type: 'row',
+        columns: 1,
+        backgroundColor: '#3B82F6',
+        padding: '28px 20px',
+        children: [
+          {
+            id: generateId(),
+            type: 'heading',
+            content: 'You’re Invited',
+            fontSize: '28px',
+            fontWeight: 'bold',
+            color: '#ffffff',
+            textAlign: 'center',
+            margin: '0'
+          }
+        ]
+      },
+      {
+        id: generateId(),
+        type: 'row',
+        columns: 1,
+        padding: '24px 20px',
+        children: [
+          {
+            id: generateId(),
+            type: 'text',
+            content:
+              '<p style="margin: 0 0 10px 0;"><strong>Thursday, May 14</strong> · 6:00 PM</p><p style="margin: 0;">123 Main St, Springfield</p>',
+            textAlign: 'center',
+            color: '#111827'
+          },
+          {
+            id: generateId(),
+            type: 'button',
+            content: 'RSVP',
+            url: 'https://example.com',
+            backgroundColor: '#3B82F6',
+            color: '#ffffff',
+            borderRadius: '8px',
+            textAlign: 'center',
+            margin: '18px 0 0 0'
+          }
+        ]
+      },
+      {
+        id: generateId(),
+        type: 'social',
+        textAlign: 'center',
+        padding: '16px',
+        socialIcons: [
+          { platform: 'linkedin', url: 'https://linkedin.com' },
+          { platform: 'website', url: 'https://example.com' },
+          { platform: 'email', url: 'mailto:hello@example.com' }
+        ]
+      }
+    ]
   }
 ];
+

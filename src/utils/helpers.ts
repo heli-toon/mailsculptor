@@ -3,6 +3,42 @@ export function generateId(): string {
 }
 
 export function getThemeColors(theme: string) {
+  const normalizeHex = (hex: string) => {
+    const cleaned = hex.trim();
+    if (!cleaned.startsWith('#')) return null;
+    const value = cleaned.slice(1);
+    if (value.length === 3 && /^[0-9a-fA-F]{3}$/.test(value)) {
+      return `#${value.split('').map(c => c + c).join('')}`.toUpperCase();
+    }
+    if (value.length === 6 && /^[0-9a-fA-F]{6}$/.test(value)) {
+      return `#${value}`.toUpperCase();
+    }
+    return null;
+  };
+
+  const clamp = (n: number) => Math.max(0, Math.min(255, n));
+
+  const adjustHex = (hex: string, amount: number) => {
+    const normalized = normalizeHex(hex);
+    if (!normalized) return hex;
+    const r = parseInt(normalized.slice(1, 3), 16);
+    const g = parseInt(normalized.slice(3, 5), 16);
+    const b = parseInt(normalized.slice(5, 7), 16);
+    const adjust = (c: number) => clamp(Math.round(c + amount));
+    const toHex = (c: number) => c.toString(16).padStart(2, '0').toUpperCase();
+    return `#${toHex(adjust(r))}${toHex(adjust(g))}${toHex(adjust(b))}`;
+  };
+
+  const custom = normalizeHex(theme);
+  if (custom) {
+    return {
+      primary: custom,
+      primaryHover: adjustHex(custom, -18),
+      primaryLight: adjustHex(custom, 120),
+      primaryDark: adjustHex(custom, -70)
+    };
+  }
+
   const themes = {
     purple: {
       primary: '#8B5CF6',

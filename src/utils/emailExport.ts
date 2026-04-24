@@ -1,7 +1,11 @@
-import { EmailElement, LayoutElement } from '../types';
+import { EmailElement, LayoutElement, EmailTemplate } from '../types';
 import { getThemeColors } from './helpers';
 
-export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], theme: string = 'purple'): string {
+export function generateEmailHTML(
+  elements: (EmailElement | LayoutElement)[],
+  theme: string = 'purple',
+  bodyBackgroundColor: string = '#ffffff'
+): string {
   const themeColors = getThemeColors(theme);
   
   const renderElement = (element: EmailElement | LayoutElement): string => {
@@ -21,7 +25,7 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
           <td style="padding: ${element.padding || '10px'}; margin: ${element.margin || '0'}; background-color: ${element.backgroundColor || 'transparent'};">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                ${element.children.map((child, index) => `
+                ${element.children.map((child) => `
                   <td width="${columnWidth}%" valign="top" style="padding: 5px;">
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                       ${renderElement(child)}
@@ -80,34 +84,38 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
         `;
 
       case 'button':
-        const buttonBg = element.backgroundColor || themeColors.primary;
-        return `
-          <tr>
-            <td style="padding: ${styles.padding}; text-align: ${styles.textAlign};">
-              <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-                <tr>
-                  <td style="background-color: ${buttonBg}; border-radius: ${styles.borderRadius}; padding: 12px 24px;">
-                    <a href="${element.url || '#'}" style="color: ${element.color || '#ffffff'}; text-decoration: none; font-family: ${styles.fontFamily}; font-size: ${styles.fontSize}; font-weight: ${styles.fontWeight}; display: block;">
-                      ${element.content || 'Button'}
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        `;
+        {
+          const buttonBg = element.backgroundColor || themeColors.primary;
+          return `
+            <tr>
+              <td style="padding: ${styles.padding}; text-align: ${styles.textAlign};">
+                <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+                  <tr>
+                    <td style="background-color: ${buttonBg}; border-radius: ${styles.borderRadius}; padding: 12px 24px;">
+                      <a href="${element.url || '#'}" style="color: ${element.color || '#ffffff'}; text-decoration: none; font-family: ${styles.fontFamily}; font-size: ${styles.fontSize}; font-weight: ${styles.fontWeight}; display: block;">
+                        ${element.content || 'Button'}
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          `;
+        }
 
       case 'link':
-        const linkColor = element.color || themeColors.primary;
-        return `
-          <tr>
-            <td style="${styleString}">
-              <a href="${element.url || '#'}" style="color: ${linkColor}; text-decoration: underline; font-family: ${styles.fontFamily}; font-size: ${styles.fontSize};">
-                ${element.content || 'Link text'}
-              </a>
-            </td>
-          </tr>
-        `;
+        {
+          const linkColor = element.color || themeColors.primary;
+          return `
+            <tr>
+              <td style="${styleString}">
+                <a href="${element.url || '#'}" style="color: ${linkColor}; text-decoration: underline; font-family: ${styles.fontFamily}; font-size: ${styles.fontSize};">
+                  ${element.content || 'Link text'}
+                </a>
+              </td>
+            </tr>
+          `;
+        }
 
       case 'image':
       case 'logo':
@@ -133,31 +141,37 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
         `;
 
       case 'spacer':
-        const spacerHeight = element.height || '20px';
-        return `
-          <tr>
-            <td style="height: ${spacerHeight}; line-height: ${spacerHeight}; font-size: 1px;">&nbsp;</td>
-          </tr>
-        `;
+        {
+          const spacerHeight = element.height || '20px';
+          return `
+            <tr>
+              <td style="height: ${spacerHeight}; line-height: ${spacerHeight}; font-size: 1px;">&nbsp;</td>
+            </tr>
+          `;
+        }
 
       case 'social':
-        const socialIcons = element.socialIcons || [];
-        const socialIconsHTML = socialIcons.map(icon => {
-          const iconUrl = getSocialIconUrl(icon.platform);
-          return `
-            <a href="${icon.url}" style="text-decoration: none; margin-right: 10px;">
-              <img src="${iconUrl}" alt="${icon.platform}" width="24" height="24" style="display: inline-block;" />
-            </a>
-          `;
-        }).join('');
+        {
+          const socialIcons = element.socialIcons || [];
+          const socialIconsHTML = socialIcons
+            .map((icon) => {
+              const iconUrl = getSocialIconUrl(icon.platform);
+              return `
+                <a href="${icon.url}" style="text-decoration: none; margin-right: 10px;">
+                  <img src="${iconUrl}" alt="${icon.platform}" width="24" height="24" style="display: inline-block;" />
+                </a>
+              `;
+            })
+            .join('');
 
-        return `
-          <tr>
-            <td style="${styleString}">
-              ${socialIconsHTML}
-            </td>
-          </tr>
-        `;
+          return `
+            <tr>
+              <td style="${styleString}">
+                ${socialIconsHTML}
+              </td>
+            </tr>
+          `;
+        }
 
       default:
         return '';
@@ -165,15 +179,25 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
   };
 
   const getSocialIconUrl = (platform: string): string => {
-    // Using simple colored icons - in production, you'd use actual social media icons
-    const icons = {
-      facebook: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMxODc3RjIiLz4KPHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggNi43NUg2LjI1VjlIMTBWMTAuMjVIOC43NVYxMkg2LjI1VjEwLjI1SDQuNVY5SDYuMjVWNi43NUg0LjVWNS41SDEwVjYuNzVIOFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo8L3N2Zz4K',
-      twitter: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMxREE1RjIiLz4KPC9zdmc+',
-      instagram: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiNFNDQwNUYiLz4KPC9zdmc+',
-      linkedin: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiMwQTY2QzIiLz4KPC9zdmc+',
-      youtube: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiByeD0iMTIiIGZpbGw9IiNGRjAwMDAiLz4KPC9zdmc+'
+    const colors: Record<string, string> = {
+      facebook: '#1877F2',
+      twitter: '#1DA1F2',
+      instagram: '#E4405F',
+      linkedin: '#0A66C2',
+      youtube: '#FF0000',
+      github: '#111827',
+      pinterest: '#E60023',
+      tiktok: '#000000',
+      whatsapp: '#25D366',
+      email: '#6B7280',
+      website: '#3B82F6'
     };
-    return icons[platform as keyof typeof icons] || icons.facebook;
+
+    const bg = colors[platform] || '#6B7280';
+    const label = (platform === 'website' ? 'W' : platform === 'email' ? '@' : platform[0]?.toUpperCase() || '?');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" rx="12" fill="${bg}"/><text x="12" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">${label}</text></svg>`;
+    const encoded = btoa(svg);
+    return `data:image/svg+xml;base64,${encoded}`;
   };
 
   const emailHTML = `
@@ -191,7 +215,7 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
       </style>
     </head>
     <body>
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 680px; margin: 0 auto; background-color: #ffffff;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 680px; margin: 0 auto; background-color: ${bodyBackgroundColor};">
         ${elements.map(renderElement).join('')}
       </table>
     </body>
@@ -199,4 +223,12 @@ export function generateEmailHTML(elements: (EmailElement | LayoutElement)[], th
   `;
 
   return emailHTML;
+}
+
+export function generateEmailHTMLFromTemplate(template: EmailTemplate): string {
+  return generateEmailHTML(
+    template.elements,
+    template.theme,
+    template.bodyBackgroundColor || '#ffffff'
+  );
 }

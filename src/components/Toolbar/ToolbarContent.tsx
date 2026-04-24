@@ -153,9 +153,11 @@ export function ToolbarContent() {
           textAlign: 'center' as const,
           padding: '20px',
           socialIcons: [
-            { platform: 'facebook', url: 'https://facebook.com' },
-            { platform: 'twitter', url: 'https://twitter.com' },
-            { platform: 'instagram', url: 'https://instagram.com' }
+            { platform: 'facebook' as const, url: 'https://facebook.com' },
+            { platform: 'twitter' as const, url: 'https://twitter.com' },
+            { platform: 'instagram' as const, url: 'https://instagram.com' },
+            { platform: 'linkedin' as const, url: 'https://linkedin.com' },
+            { platform: 'youtube' as const, url: 'https://youtube.com' }
           ]
         };
 

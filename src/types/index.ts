@@ -22,7 +22,18 @@ export interface EmailElement {
 }
 
 export interface SocialIcon {
-  platform: 'facebook' | 'twitter' | 'instagram' | 'linkedin' | 'youtube';
+  platform:
+    | 'facebook'
+    | 'twitter'
+    | 'instagram'
+    | 'linkedin'
+    | 'youtube'
+    | 'github'
+    | 'pinterest'
+    | 'tiktok'
+    | 'whatsapp'
+    | 'email'
+    | 'website';
   url: string;
 }
 
@@ -42,11 +53,12 @@ export interface EmailTemplate {
   name: string;
   elements: (EmailElement | LayoutElement)[];
   theme: ThemeColor;
+  bodyBackgroundColor?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type ThemeColor = 'purple' | 'blue' | 'red' | 'orange' | 'black';
+export type ThemeColor = 'purple' | 'blue' | 'red' | 'orange' | 'black' | `#${string}`;
 
 export interface AppState {
   currentTemplate: EmailTemplate | null;

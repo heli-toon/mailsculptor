@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { TextSettings } from './TextSettings';
 import { ButtonSettings } from './ButtonSettings';
@@ -7,15 +6,19 @@ import { DividerSettings } from './DividerSettings';
 import { SpacerSettings } from './SpacerSettings';
 import { SocialSettings } from './SocialSettings';
 import { RowSettings } from './RowSettings';
+import { TemplateSettings } from './TemplateSettings';
 
 export function ElementSettings() {
   const { selectedElement } = useApp();
 
   if (!selectedElement) {
     return (
-      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-        <i className="bi bi-cursor text-2xl mb-2 block"></i>
-        <p className="text-sm">Select an element to edit its properties</p>
+      <div className="p-4">
+        <TemplateSettings />
+        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-center text-gray-500 dark:text-gray-400">
+          <i className="bi bi-cursor text-2xl mb-2 block"></i>
+          <p className="text-sm">Select an element to edit its properties</p>
+        </div>
       </div>
     );
   }

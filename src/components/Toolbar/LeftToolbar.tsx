@@ -1,22 +1,22 @@
 import { useApp } from '../../contexts/AppContext';
 import { Button } from '../ui/Button';
 import { ToolbarContent } from './ToolbarContent';
-import { generateEmailHTML } from '../../utils/emailExport';
+import { generateEmailHTMLFromTemplate } from '../../utils/emailExport';
 import { copyToClipboard, downloadFile } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
 
 export function LeftToolbar() {
-  const { currentTemplate, theme, clearTemplate } = useApp();
+  const { currentTemplate, clearTemplate } = useApp();
 
   const handleCopyHTML = async () => {
     if (!currentTemplate) return;
 
     try {
-      const html = generateEmailHTML(currentTemplate.elements, theme);
+      const html = generateEmailHTMLFromTemplate(currentTemplate);
       await copyToClipboard(html);
       toast.success('HTML copied to clipboard!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to copy HTML');
     }
   };
@@ -24,7 +24,7 @@ export function LeftToolbar() {
   const handleDownloadHTML = () => {
     if (!currentTemplate) return;
 
-    const html = generateEmailHTML(currentTemplate.elements, theme);
+    const html = generateEmailHTMLFromTemplate(currentTemplate);
     downloadFile(html, `${currentTemplate.name.toLowerCase().replace(/\s+/g, '-')}.html`);
     toast.success('HTML file downloaded!');
   };

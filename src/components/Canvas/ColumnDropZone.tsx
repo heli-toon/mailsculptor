@@ -210,7 +210,9 @@ export function ColumnDropZone({ rowId, columnIndex, children }: ColumnDropZoneP
           socialIcons: [
             { platform: 'facebook', url: 'https://facebook.com' },
             { platform: 'twitter', url: 'https://twitter.com' },
-            { platform: 'instagram', url: 'https://instagram.com' }
+            { platform: 'instagram', url: 'https://instagram.com' },
+            { platform: 'linkedin', url: 'https://linkedin.com' },
+            { platform: 'youtube', url: 'https://youtube.com' }
           ]
         };
 

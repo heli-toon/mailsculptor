@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { EmailElement } from '../../types';
 
@@ -33,9 +33,9 @@ export function ImageSettings({ element }: ImageSettingsProps) {
     });
   }, [element.id]);
 
-  const handleChange = (property: string, value: any) => {
+  const handleChange = (property: string, value: unknown) => {
     setLocalValues(prev => ({ ...prev, [property]: value }));
-    updateElement(element.id, { [property]: value });
+    updateElement(element.id, { [property]: value } as Partial<EmailElement>);
   };
 
   const parsePixelValue = (value: string) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { EmailElement } from '../../types';
 
@@ -9,8 +8,8 @@ interface DividerSettingsProps {
 export function DividerSettings({ element }: DividerSettingsProps) {
   const { updateElement } = useApp();
 
-  const handleChange = (property: string, value: any) => {
-    updateElement(element.id, { [property]: value });
+  const handleChange = <K extends keyof EmailElement>(property: K, value: EmailElement[K]) => {
+    updateElement(element.id, { [property]: value } as Partial<EmailElement>);
   };
 
   return (

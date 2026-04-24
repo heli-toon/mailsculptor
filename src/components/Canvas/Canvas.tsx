@@ -80,11 +80,11 @@ export function Canvas() {
           </div>
 
           {/* Canvas - Always white background like an HTML document */}
-          <div
-            className="bg-white shadow-xl rounded-lg overflow-hidden transition-all duration-300 mx-auto group"
-            style={{ width: canvasWidth, minHeight: '600px' }}
-            onClick={handleCanvasClick}
-          >
+           <div
+             className="shadow-xl rounded-lg overflow-hidden transition-all duration-300 mx-auto group"
+             style={{ width: canvasWidth, minHeight: '600px', backgroundColor: currentTemplate.bodyBackgroundColor || '#ffffff' }}
+             onClick={handleCanvasClick}
+           >
             {currentTemplate.elements.length === 0 ? (
               <div className="h-96 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 m-4 rounded-lg">
                 <div className="text-center">

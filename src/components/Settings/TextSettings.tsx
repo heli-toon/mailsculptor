@@ -34,9 +34,9 @@ export function TextSettings({ element }: TextSettingsProps) {
     });
   }, [element.id]);
 
-  const handleChange = (property: string, value: any) => {
+  const handleChange = (property: string, value: unknown) => {
     setLocalValues(prev => ({ ...prev, [property]: value }));
-    updateElement(element.id, { [property]: value });
+    updateElement(element.id, { [property]: value } as Partial<EmailElement>);
   };
 
   const parsePixelValue = (value: string) => {

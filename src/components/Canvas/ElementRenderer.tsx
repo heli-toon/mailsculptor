@@ -210,43 +210,47 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
         );
 
       case 'button':
-        const buttonBg = emailElement.backgroundColor || themeColors.primary;
-        return (
-          <div {...commonProps} style={{ textAlign: styles.textAlign as any }}>
-            <div
-              style={{
-                display: 'inline-block',
-                backgroundColor: buttonBg,
-                borderRadius: styles.borderRadius,
-                padding: '12px 24px',
-                textAlign: 'center'
-              }}
-            >
-              <span style={{ color: emailElement.color || '#ffffff', textDecoration: 'none', fontFamily: styles.fontFamily, fontSize: styles.fontSize, fontWeight: styles.fontWeight }}>
-                {emailElement.content || 'Button'}
-              </span>
+        {
+          const buttonBg = emailElement.backgroundColor || themeColors.primary;
+          return (
+            <div {...commonProps} style={{ textAlign: styles.textAlign as React.CSSProperties['textAlign'] }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  backgroundColor: buttonBg,
+                  borderRadius: styles.borderRadius,
+                  padding: '12px 24px',
+                  textAlign: 'center'
+                }}
+              >
+                <span style={{ color: emailElement.color || '#ffffff', textDecoration: 'none', fontFamily: styles.fontFamily, fontSize: styles.fontSize, fontWeight: styles.fontWeight }}>
+                  {emailElement.content || 'Button'}
+                </span>
+              </div>
+              {renderControls()}
             </div>
-            {renderControls()}
-          </div>
-        );
+          );
+        }
 
       case 'link':
-        const linkColor = emailElement.color || themeColors.primary;
-        return (
-          <div {...commonProps}>
-            <div style={styles}>
-              <span style={{ color: linkColor, textDecoration: 'underline' }}>
-                {emailElement.content || 'Link text'}
-              </span>
+        {
+          const linkColor = emailElement.color || themeColors.primary;
+          return (
+            <div {...commonProps}>
+              <div style={styles}>
+                <span style={{ color: linkColor, textDecoration: 'underline' }}>
+                  {emailElement.content || 'Link text'}
+                </span>
+              </div>
+              {renderControls()}
             </div>
-            {renderControls()}
-          </div>
-        );
+          );
+        }
 
       case 'image':
       case 'logo':
         return (
-          <div {...commonProps} style={{ textAlign: styles.textAlign as any }}>
+          <div {...commonProps} style={{ textAlign: styles.textAlign as React.CSSProperties['textAlign'] }}>
             <img
               src={emailElement.src || 'https://via.placeholder.com/150x100?text=Image'}
               alt={emailElement.alt || ''}
@@ -276,49 +280,81 @@ export function ElementRenderer({ element, isSelected, onSelect }: ElementRender
         );
 
       case 'spacer':
-        const spacerHeight = emailElement.height || '20px';
-        return (
-          <div {...commonProps}>
-            <div
-              style={{
-                height: spacerHeight,
-                backgroundColor: '#f3f4f6',
-                border: '2px dashed #d1d5db',
-                borderRadius: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#6b7280',
-                fontSize: '12px'
-              }}
-            >
-              Spacer ({spacerHeight})
+        {
+          const spacerHeight = emailElement.height || '20px';
+          return (
+            <div {...commonProps}>
+              <div
+                style={{
+                  height: spacerHeight,
+                  backgroundColor: '#f3f4f6',
+                  border: '2px dashed #d1d5db',
+                  borderRadius: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#6b7280',
+                  fontSize: '12px'
+                }}
+              >
+                Spacer ({spacerHeight})
+              </div>
+              {renderControls()}
             </div>
-            {renderControls()}
-          </div>
-        );
+          );
+        }
 
       case 'social':
-        const socialIcons = emailElement.socialIcons || [];
-        return (
-          <div {...commonProps}>
-            <div style={styles}>
-              {socialIcons.length > 0 ? (
-                socialIcons.map((icon, index) => (
-                  <span key={index} style={{ marginRight: '10px' }}>
-                    <i className={`bi bi-${icon.platform}`} style={{ fontSize: '24px', color: themeColors.primary }}></i>
-                  </span>
-                ))
-              ) : (
-                <div className="text-gray-400 text-sm">
-                  <i className="bi bi-share mr-2"></i>
-                  Social Icons (click to configure)
-                </div>
-              )}
+        {
+          const socialIcons = emailElement.socialIcons || [];
+          const getBootstrapIconName = (platform: string) => {
+            switch (platform) {
+              case 'facebook':
+                return 'facebook';
+              case 'twitter':
+                return 'twitter';
+              case 'instagram':
+                return 'instagram';
+              case 'linkedin':
+                return 'linkedin';
+              case 'youtube':
+                return 'youtube';
+              case 'github':
+                return 'github';
+              case 'pinterest':
+                return 'pinterest';
+              case 'tiktok':
+                return 'tiktok';
+              case 'whatsapp':
+                return 'whatsapp';
+              case 'email':
+                return 'envelope';
+              case 'website':
+                return 'globe';
+              default:
+                return 'link-45deg';
+            }
+          };
+          return (
+            <div {...commonProps}>
+              <div style={styles}>
+                {socialIcons.length > 0 ? (
+                  socialIcons.map((icon, index) => (
+                    <span key={index} style={{ marginRight: '10px' }}>
+                      <i className={`bi bi-${getBootstrapIconName(icon.platform)}`} style={{ fontSize: '24px', color: themeColors.primary }}></i>
+                    </span>
+                  ))
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    <i className="bi bi-share mr-2"></i>
+                    Social Icons (click to configure)
+                  </div>
+                )}
+              </div>
+              {renderControls()}
             </div>
-            {renderControls()}
-          </div>
-        );
+          );
+        }
 
       default:
         return null;
